@@ -2020,10 +2020,22 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
         viewableLevels.add(level); //stores reference to existing level object from home.getLevels()
       }
     }
-    if(pageIndex >= viewableLevels.size()){
-      return NO_SUCH_PAGE;
+    Level printLevel;
+    //if there are no levels, it should only have one print page.
+    if(this.home.getLevels().isEmpty()){
+      if(pageIndex > 0){
+        return NO_SUCH_PAGE;
+      }
+      printLevel = null;
     }
-    Level printLevel = viewableLevels.get(pageIndex); //reference to level object to print out
+    //otherwise, there are >= 1 levels and should have one page per viewable level
+    else {
+      if (pageIndex >= viewableLevels.size()){
+        return NO_SUCH_PAGE;
+      }
+      printLevel = viewableLevels.get(pageIndex); //reference to level object to print out
+    }
+
     Level originalLevel = this.home.getSelectedLevel(); //store user selected level object
     try { //try to print out the requested print level
       this.home.setSelectedLevel(printLevel); //temporarily set selected level to the level to print
@@ -2094,7 +2106,8 @@ public class PlanComponent extends JComponent implements PlanView, Scrollable, P
         g2D.dispose();
         return PAGE_EXISTS;
       } else {
-        return NO_SUCH_PAGE;
+        // requested page does exist but it is empty.
+        return PAGE_EXISTS;
       }
     } finally { //make sure that if it doesn't work then restore the user selected level
       this.home.setSelectedLevel(originalLevel);
